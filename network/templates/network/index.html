@@ -1,0 +1,28 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+{% if user.is_authenticated %}
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Post">
+</form>
+{% endif %}
+
+<br>
+
+    <div id="posts" style="width: 100%; overflow: hidden;">
+        {% for post in post_list %}
+            <article class="media content-section">
+                <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2" href="#">{{ post.username }}</a>
+                    <small class="text-muted">{{ post.dt_posted }}</small>
+                </div>
+                <p class="article-content">{{ post.content }}</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>  
+
+{% endblock %}
