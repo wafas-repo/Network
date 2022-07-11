@@ -1,7 +1,10 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.core.paginator import Paginator
 from .forms import PostCreateForm
@@ -12,9 +15,10 @@ from .models import User, Post
 def index(request):
     posts = Post.objects.all().order_by('-dt_posted');
     # set up pagination
-    p = Paginator(posts, 10)
+    p = Paginator(posts, 5)
     page = request.GET.get('page')
     post_list = p.get_page(page)
+    nums = 'a' * post_list.paginator.num_pages
 
     form = PostCreateForm(request.POST or None)
     if form.is_valid():
@@ -26,10 +30,22 @@ def index(request):
     context = {
         'form': form,
         'posts': posts,
-        'post_list': post_list
+        'post_list': post_list,
+        'nums': nums
     }
     return render(request, "network/index.html", context)
 
+@csrf_exempt
+def edit(request, post_id):
+    post = Post.objects.get(id=post_id)
+
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("content") is not None:
+            post.content = data["content"]
+        post.save()
+        return HttpResponse(status=204)
+        
 
 def login_view(request):
     if request.method == "POST":
@@ -81,3 +97,4 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
