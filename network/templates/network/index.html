@@ -23,9 +23,20 @@
                     <div id="post-content-{{ post.id }}">
                         <p id="edit" class="article-content">{{ post.content }}</p> 
                     </div>
-                    {% if post.username ==  request.user %}
+                    <form action="{% url 'like_post' post.id %}" method="POST" class='like-form' id="{{ post.id }}">
+                        {% csrf_token %}
+                        <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-info like-btn-{{ post.id }}">
+                            {% if request.user in post.likes.all %}
+                                unlike
+                            {% else %}
+                                like
+                            {% endif %}
+                        </button>
+                        <div class="like-count-{{ post.id }}">{{ post.total_likes }}</div> likes
+                      </form>
+                      {% if post.username ==  request.user %}
                         <a id="editBtn" class="edit_Button"  data-post_id="{{ post.id }}" href="#">Edit</a>
-                    {% endif %}
+                      {% endif %}
                 </div>
             </article>
         {% endfor %}

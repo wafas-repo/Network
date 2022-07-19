@@ -1,4 +1,5 @@
 import json
+from turtle import pos
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -45,7 +46,25 @@ def edit(request, post_id):
             post.content = data["content"]
         post.save()
         return HttpResponse(status=204)
-        
+
+@csrf_exempt
+def like(request, post_id):
+    post = Post.objects.get(id=post_id)
+    liked = False
+    if post.likes.filter(id=request.user.id).exists():
+        post.likes.remove(request.user)
+        liked = False
+    else:
+        post.likes.add(request.user)
+        liked = True
+    data = {
+            'message': "Successfully submitted form data.",
+            'post_id': post_id,
+            'liked': liked,
+            'like_total': post.total_likes()
+    }
+    return JsonResponse(data)
+
 
 def login_view(request):
     if request.method == "POST":

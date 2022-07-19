@@ -65,6 +65,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
     })
 
+    // Like post 
+
+    document.querySelectorAll('.like-form').forEach(form => {
+
+        form.onsubmit = function (e) {
+            e.preventDefault();
+            const post_id = this.getAttribute('id');
+            var url = this.getAttribute('action');
+            const likeText = document.querySelector(`.like-btn-${post_id}`)
+            var like_count = document.querySelector(`.like-count-${post_id}`)
+            fetch(url)
+            .then(res => res.json())
+            .then(post => {
+                console.log(post)
+                if (post.liked) {
+                    likeText.innerHTML = 'Unlike'
+                    like_count.innerHTML = post.like_total
+
+                } else {
+                    likeText.innerHTML = 'Like'
+                    like_count.innerHTML = post.like_total
+                }
+            })
+    
+        }
+
+    })
+
+
+
+
+
+
 })
 
 
