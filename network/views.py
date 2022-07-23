@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from .forms import PostCreateForm
 
-from .models import User, Post
+from .models import User, Post, UserProfile
 
 
 def index(request):
@@ -35,7 +35,7 @@ def index(request):
         'nums': nums
     }
     return render(request, "network/index.html", context)
-
+    
 @csrf_exempt
 def edit(request, post_id):
     post = Post.objects.get(id=post_id)
@@ -116,4 +116,18 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+def profile(request, user_id):
+
+    profile = UserProfile.objects.get(user=user_id)
+    user = profile.user
+    posts = Post.objects.filter(username=user).order_by('-dt_posted')
+
+    return render(request, "network/profile.html", {
+        "profile": profile, 
+        'user': user,
+        "posts": posts
+    })
+
 
