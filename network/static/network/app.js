@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(url)
             .then(res => res.json())
             .then(post => {
-                console.log(post)
                 if (post.liked) {
                     likeText.innerHTML = 'Unlike'
                     like_count.innerHTML = post.like_total

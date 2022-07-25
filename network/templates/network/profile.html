@@ -10,6 +10,24 @@
             {% if profile.user %}
             <h3 class="py-4">{{ profile.user }}</h3>
             {% endif %}
+            <div class="mb-3">
+                <p>Followers: {{ number_of_followers }}</p>
+                <p>Following: {{ number_of_following }}</p>
+                {% if profile.user == request.user %}
+                {% else %}
+                {% if is_following %}
+                <form method="POST" action="{% url 'remove_follower' profile.user.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+                </form>
+                {% else %}
+                <form method="POST" action="{% url 'add_follower' profile.user.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-success" type="submit">Follow</button>
+                </form>
+                {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -33,7 +51,7 @@
                     {% endif %}
                 </button>
                 <div class="like-count-{{ post.id }}">{{ post.total_likes }}</div> likes
-              </form>
+            </form>
               {% if post.username ==  request.user %}
                 <a id="editBtn" class="edit_Button"  data-post_id="{{ post.id }}" href="#">Edit</a>
               {% endif %}
