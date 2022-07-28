@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Edit Post
-
     document.querySelectorAll('.edit_Button').forEach(btn => {
 
         btn.onclick = function () {

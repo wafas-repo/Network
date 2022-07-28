@@ -65,6 +65,34 @@ def like(request, post_id):
     }
     return JsonResponse(data)
 
+def profile(request, username):
+    uid = User.objects.get(username=username)
+    profile = UserProfile.objects.get(user=uid)
+    user = profile.user
+    posts = Post.objects.filter(username=user).order_by('-dt_posted')
+    followers = profile.followers.all()
+    following = profile.following.all()
+
+    if len(followers) == 0:
+        is_following = False
+        
+    for follower in followers:
+        if follower == request.user:
+            is_following = True
+        else:
+            is_following = False
+
+    number_of_followers = len(followers)
+    number_of_following = len(following)
+
+    return render(request, "network/profile.html", {
+        "profile": profile, 
+        "posts": posts,
+        "number_of_followers": number_of_followers,
+        "number_of_following": number_of_following,
+        "is_following": is_following
+    })
+
 
 def login_view(request):
     if request.method == "POST":
@@ -117,37 +145,6 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-
-def profile(request, username):
-    
-    user_name = User.objects.get(username=username)
-    user_id = user_name.id
-    profile = UserProfile.objects.get(user=user_id)
-    user = profile.user
-    posts = Post.objects.filter(username=user).order_by('-dt_posted')
-    followers = profile.followers.all()
-    following = profile.following.all()
-
-    if len(followers) == 0:
-        is_following = False
-        
-    for follower in followers:
-        if follower == request.user:
-            is_following = True
-        else:
-            is_following = False
-
-    number_of_followers = len(followers)
-    number_of_following = len(following)
-
-    return render(request, "network/profile.html", {
-        "profile": profile, 
-        "posts": posts,
-        "number_of_followers": number_of_followers,
-        "number_of_following": number_of_following,
-        "is_following": is_following
-    })
-
 def add_follower(request, user_id):
     profile = UserProfile.objects.get(user=user_id)
     profile.followers.add(request.user)
@@ -163,5 +160,19 @@ def remove_follower(request, user_id):
     curr_user.following.remove(profile.user)
 
     return redirect('profile', profile.user)
+
+def following(request, username):
+    print(username)
+    uid = User.objects.get(username=username)
+    profile = UserProfile.objects.get(user=uid)
+    following = profile.following.all()
+    posts = Post.objects.filter(username__in=following).order_by('-dt_posted')
+           
+    return render(request, "network/following.html", {
+        "posts":posts
+    })
+    
+
+
 
 
