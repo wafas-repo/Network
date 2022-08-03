@@ -72,6 +72,10 @@ def profile(request, username):
     posts = Post.objects.filter(username=user).order_by('-dt_posted')
     followers = profile.followers.all()
     following = profile.following.all()
+    p = Paginator(posts, 5)
+    page = request.GET.get('page')
+    post_list = p.get_page(page)
+    nums = 'a' * post_list.paginator.num_pages
 
     if len(followers) == 0:
         is_following = False
@@ -90,7 +94,9 @@ def profile(request, username):
         "posts": posts,
         "number_of_followers": number_of_followers,
         "number_of_following": number_of_following,
-        "is_following": is_following
+        "is_following": is_following,
+        'post_list': post_list,
+        'nums': nums
     })
 
 
@@ -167,9 +173,15 @@ def following(request, username):
     profile = UserProfile.objects.get(user=uid)
     following = profile.following.all()
     posts = Post.objects.filter(username__in=following).order_by('-dt_posted')
+    p = Paginator(posts, 5)
+    page = request.GET.get('page')
+    post_list = p.get_page(page)
+    nums = 'a' * post_list.paginator.num_pages
            
     return render(request, "network/following.html", {
-        "posts":posts
+        "posts":posts,
+        'post_list': post_list,
+        'nums': nums
     })
     
 
