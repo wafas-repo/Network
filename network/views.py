@@ -16,7 +16,7 @@ from .models import User, Post, UserProfile
 def index(request):
     posts = Post.objects.all().order_by('-dt_posted');
     # set up pagination
-    p = Paginator(posts, 5)
+    p = Paginator(posts, 10)
     page = request.GET.get('page')
     post_list = p.get_page(page)
     nums = 'a' * post_list.paginator.num_pages
@@ -72,7 +72,7 @@ def profile(request, username):
     posts = Post.objects.filter(username=user).order_by('-dt_posted')
     followers = profile.followers.all()
     following = profile.following.all()
-    p = Paginator(posts, 5)
+    p = Paginator(posts, 10)
     page = request.GET.get('page')
     post_list = p.get_page(page)
     nums = 'a' * post_list.paginator.num_pages
@@ -173,7 +173,7 @@ def following(request, username):
     profile = UserProfile.objects.get(user=uid)
     following = profile.following.all()
     posts = Post.objects.filter(username__in=following).order_by('-dt_posted')
-    p = Paginator(posts, 5)
+    p = Paginator(posts, 10)
     page = request.GET.get('page')
     post_list = p.get_page(page)
     nums = 'a' * post_list.paginator.num_pages
