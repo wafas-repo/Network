@@ -39,8 +39,8 @@
                             <div class="like-count-{{ post.id }} ml-1 mr-1">{{ post.total_likes }}</div> 
                             <p>likes</p>
                             {% else %}
-                                <a href="{% url 'login' %}"><button class="btn btn-info like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
-                                <div class="like-count-{{ post.id }}">{{ post.total_likes }}</div> likes
+                                <a href="{% url 'login' %}"><button class="like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
+                                <div class="like-count-{{ post.id }} ml-1 mr-1"">{{ post.total_likes }}</div> likes
                             {% endif %}
                         </div>
                     </div>
