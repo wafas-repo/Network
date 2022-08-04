@@ -21,12 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const save_edit = document.createElement('input');
             save_edit.type = 'submit';
             save_edit.value = 'Save';
-            save_edit.classList.add('btn', 'btn-primary');
+            save_edit.classList.add('mr-1', 'mb-2');
 
             const cancel_edit = document.createElement('button');
             cancel_edit.type = 'button';
-            cancel_edit.textContent = 'Cancel'
-            cancel_edit.classList.add('btn', 'btn-danger');
+            cancel_edit.textContent = 'Cancel';
+            cancel_edit.style.color = 'white';
+            cancel_edit.style.backgroundColor = '#d9534f';
+            cancel_edit.classList.add('mb-2');
 
             edit_form.appendChild(save_edit);
             edit_form.appendChild(cancel_edit);
@@ -77,11 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(post => {
                 if (post.liked) {
-                    likeText.innerHTML = 'Unlike'
+                    likeText.innerHTML = '<i class="fa fa-solid fa-thumbs-down"></i> unlike'
                     like_count.innerHTML = post.like_total
 
                 } else {
-                    likeText.innerHTML = 'Like'
+                    likeText.innerHTML = '<i class="fa fa-solid fa-thumbs-up"></i> like'
                     like_count.innerHTML = post.like_total
                 }
             })
