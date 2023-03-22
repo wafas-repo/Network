@@ -1,43 +1,49 @@
 {% extends "network/layout.html" %}
-
+{% load static %}
 {% block body %}
 
 <div class="container">
-
-    <div class="row justify-content-center mt-5">
-        <div class="card shadow-sm col-md-6 col-sm-6 border-bottom px-5 pt-3 mb-3">
-            <div class="row">
-                <div>
-                    <img src="{{ profile.picture.url }}" class="rounded-circle" width="100" height="100" />
-                    {% if profile.user %}
-                        <h3 class="py-2">{{ profile.user }}</h3>
-                    {% endif %}
-                </div>
-                <p class=" mt-5 ml-5 mr-2">Followers: {{ number_of_followers }}</p>
-                <p class="mt-5">Following: {{ number_of_following }}</p>
-            </div>
-            <div class="mb-3">
-                {% if profile.user == request.user %}
+    <div  class="profile">
+        <div class="profile__avatar">
+          <div class="avatar avatar--large active">
+            <img src="{{ profile.picture.url }}">
+          </div>
+        </div>
+        <div class="profile__info">
+          <p>@{{ profile.user }}<span style="color: #b2bdbd;; font-size: 14px;"></span></p>
+               
+          <div class="mb-3">
+            {% if profile.user == request.user %}
+                <a href="{% url 'update-user' %}" class="btn btn--pill">Edit Profile</a>
+            {% else %}
+                {% if is_following %}
+                <form method="POST" action="{% url 'remove_follower' profile.user.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+                </form>
                 {% else %}
-                    {% if is_following %}
-                    <form method="POST" action="{% url 'remove_follower' profile.user.id %}">
+                    {% if user.is_authenticated %}
+                    <form method="POST" action="{% url 'add_follower' profile.user.id %}">
                         {% csrf_token %}
-                        <button class="btn btn-outline-danger" type="submit">Unfollow</button>
+                        <button class="btn btn-outline-success" type="submit">Follow</button>
                     </form>
                     {% else %}
-                        {% if user.is_authenticated %}
-                        <form method="POST" action="{% url 'add_follower' profile.user.id %}">
-                            {% csrf_token %}
-                            <button class="btn btn-outline-success" type="submit">Follow</button>
-                        </form>
-                        {% else %}
-                            <a href="{% url 'login' %}"><button class="btn btn-outline-success" type="submit">Follow</button></a>
-                        {% endif %}
+                        <a href="{% url 'login' %}"><button class="btn btn-outline-success" type="submit">Follow</button></a>
                     {% endif %}
                 {% endif %}
-            </div>
+            {% endif %}
         </div>
+     
+        </div>
+        <div style="display: flex; gap: 10px; justify-content:center;" class="profile-info">
+          <p class="">Followers: {{ number_of_followers }}</p>
+          <p class="">Following: {{ number_of_following }}</p>
+        </div>
+      </div>
+    <div class="row justify-content-center mt-5">
+       
     </div>
+    
 
     {% for post in post_list %}
     <article class="media content-section">
@@ -51,22 +57,26 @@
             </div>
             <div class="container">
                 <div class="row">
-                        {% if user.is_authenticated %}
+                    {% if user.is_authenticated %}
+                    <div class="like-sect">
                         <form action="{% url 'like_post' post.id %}" method="POST" class='like-form' id="{{ post.id }}">
                             {% csrf_token %}
-                            <button type="submit" name="post_id" value="{{ post.id }}" class="like-btn-{{ post.id }}">
+                            <button type="submit" name="post_id" value="{{ post.id }}" class="like-form-btn like-btn-{{ post.id }}">
                                 {% if request.user in post.likes.all %}
-                                    <i class="fa fa-solid fa-thumbs-down"></i> unlike
+                                    <i class="fa fa-solid fa-heart"></i> 
                                 {% else %}
-                                    <i class="fa fa-solid fa-thumbs-up"></i> like
+                                    <i class="far fa-regualr fa-heart"></i>
                                 {% endif %}
                             </button>
                         </form>
-                    <div class="like-count-{{ post.id }} ml-1 mr-1">{{ post.total_likes }}</div> 
-                    <p>likes</p>
+                        <div class="like-count-{{ post.id }} ml-1 mr-1">{{ post.total_likes }}</div> 
+                        <p>likes</p>
+                    </div>
                     {% else %}
-                        <a href="{% url 'login' %}"><button class="like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
+                    <div class="like-sect">
+                        <a href="{% url 'login' %}"><button class="like-form-btn like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
                         <div class="like-count-{{ post.id }} ml-1 mr-1">{{ post.total_likes }}</div> likes
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -82,16 +92,16 @@
 <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
         {% if post_list.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li> 
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.previous_page_number }}">Previous</a></li> 
+            <li class="page-item"><a class=" btn btn--sub page-link" href="?page=1">&laquo; First</a></li> 
+            <li class="page-item"><a class=" btn btn--sub page-link" href="?page={{ post_list.previous_page_number }}">Previous</a></li> 
         {% endif %}
         <!--<li class="page-item disabled"><a class="page-link" href="#">Page {{ post_list.number }} of {{ post_list.paginator.num_pages }}</a></li> -->
         {% for i in nums %}
-            <li class="page-item"><a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li> 
         {% endfor %}
         {% if post_list.has_next%}
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.next_page_number }}">Next</a></li> 
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.paginator.num_pages }}"> Last &raquo;</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ post_list.next_page_number }}">Next</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ post_list.paginator.num_pages }}"> Last &raquo;</a></li> 
         {% endif %}
 
      </ul>

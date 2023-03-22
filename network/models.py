@@ -11,7 +11,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, primary_key=True, verbose_name='user', related_name='profile', on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to='uploads/profile_pictures', default='uploads/profile_pictures/default.png', blank=True)
+    picture = models.ImageField(null=True, default='avatar.svg')
     followers = models.ManyToManyField(User, blank=True, related_name='followers')
     following = models.ManyToManyField(User,blank=True, related_name='following')
 

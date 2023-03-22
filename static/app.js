@@ -21,13 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const save_edit = document.createElement('input');
             save_edit.type = 'submit';
             save_edit.value = 'Save';
+            save_edit.style.backgroundColor = '#71c6dd';
+            save_edit.style.color = 'white'
             save_edit.classList.add('mr-1', 'mb-2');
 
             const cancel_edit = document.createElement('button');
             cancel_edit.type = 'button';
             cancel_edit.textContent = 'Cancel';
-            cancel_edit.style.color = 'white';
-            cancel_edit.style.backgroundColor = '#d9534f';
+            cancel_edit.style.color = '#71c6dd';
+            cancel_edit.style.backgroundColor = 'transparent';
             cancel_edit.classList.add('mb-2');
 
             edit_form.appendChild(save_edit);
@@ -79,11 +81,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(post => {
                 if (post.liked) {
-                    likeText.innerHTML = '<i class="fa fa-solid fa-thumbs-down"></i> unlike'
+                    likeText.innerHTML = '<i class="fa fa-solid fa-heart"></i>'
                     like_count.innerHTML = post.like_total
 
                 } else {
-                    likeText.innerHTML = '<i class="fa fa-solid fa-thumbs-up"></i> like'
+                    likeText.innerHTML = '<i class="far fa-regualr fa-heart"></i>'
                     like_count.innerHTML = post.like_total
                 }
             })
@@ -91,12 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
     })
-
-
-
-
-
-
 })
 
 

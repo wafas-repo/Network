@@ -8,13 +8,15 @@ from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import reverse
 from django.core.paginator import Paginator
-from .forms import PostCreateForm
+from .forms import PostCreateForm, UserForm
 
 from .models import User, Post, UserProfile
 
 
 def index(request):
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
     posts = Post.objects.all().order_by('-dt_posted');
+    users = UserProfile.objects.all().order_by('followers')[0:5];
     # set up pagination
     p = Paginator(posts, 10)
     page = request.GET.get('page')
@@ -31,6 +33,8 @@ def index(request):
     context = {
         'form': form,
         'posts': posts,
+        'recent_posts':recent_posts,
+        'users': users,
         'post_list': post_list,
         'nums': nums
     }
@@ -65,42 +69,10 @@ def like(request, post_id):
     }
     return JsonResponse(data)
 
-def profile(request, username):
-    uid = User.objects.get(username=username)
-    profile = UserProfile.objects.get(user=uid)
-    user = profile.user
-    posts = Post.objects.filter(username=user).order_by('-dt_posted')
-    followers = profile.followers.all()
-    following = profile.following.all()
-    p = Paginator(posts, 10)
-    page = request.GET.get('page')
-    post_list = p.get_page(page)
-    nums = 'a' * post_list.paginator.num_pages
-
-    if len(followers) == 0:
-        is_following = False
-        
-    for follower in followers:
-        if follower == request.user:
-            is_following = True
-        else:
-            is_following = False
-
-    number_of_followers = len(followers)
-    number_of_following = len(following)
-
-    return render(request, "network/profile.html", {
-        "profile": profile, 
-        "posts": posts,
-        "number_of_followers": number_of_followers,
-        "number_of_following": number_of_following,
-        "is_following": is_following,
-        'post_list': post_list,
-        'nums': nums
-    })
-
 
 def login_view(request):
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
+    users = UserProfile.objects.all().order_by('followers')[0:5];
     if request.method == "POST":
 
         # Attempt to sign user in
@@ -117,7 +89,7 @@ def login_view(request):
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "network/login.html")
+        return render(request, "network/login.html", {'recent_posts':recent_posts, 'users':users})
 
 
 def logout_view(request):
@@ -126,6 +98,8 @@ def logout_view(request):
 
 
 def register(request):
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
+    users = UserProfile.objects.all().order_by('followers')[0:5];
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
@@ -149,7 +123,46 @@ def register(request):
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "network/register.html")
+        return render(request, "network/register.html", {'recent_posts':recent_posts, 'users':users})
+
+def profile(request, pk):
+    uid = User.objects.get(id=pk)
+    users = UserProfile.objects.all().order_by('followers')[0:5];
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
+    profile = UserProfile.objects.get(user=uid)
+    user = profile.user
+    posts = Post.objects.filter(username=user).order_by('-dt_posted')
+    followers = profile.followers.all()
+    following = profile.following.all()
+    p = Paginator(posts, 10)
+    page = request.GET.get('page')
+    post_list = p.get_page(page)
+    nums = 'a' * post_list.paginator.num_pages
+
+    if len(followers) == 0:
+        is_following = False
+
+    if request.user in followers:
+        is_following = True
+    else:
+        is_following = False
+        
+    number_of_followers = len(followers)
+    number_of_following = len(following)
+
+
+    return render(request, "network/profile.html", {
+        "profile": profile, 
+        "posts": posts,
+        'users':users,
+        'recent_posts':recent_posts,
+        "number_of_followers": number_of_followers,
+        "number_of_following": number_of_following,
+        "is_following": is_following,
+        'post_list': post_list,
+        'nums': nums
+    })
+
 
 def add_follower(request, user_id):
     profile = UserProfile.objects.get(user=user_id)
@@ -157,7 +170,7 @@ def add_follower(request, user_id):
     curr_user = UserProfile.objects.get(user=request.user.id)
     curr_user.following.add(profile.user)
 
-    return redirect('profile', profile.user)
+    return redirect('profile', profile.user.id)
 
 def remove_follower(request, user_id):
     profile = UserProfile.objects.get(user=user_id)
@@ -165,10 +178,11 @@ def remove_follower(request, user_id):
     curr_user = UserProfile.objects.get(user=request.user.id)
     curr_user.following.remove(profile.user)
 
-    return redirect('profile', profile.user)
+    return redirect('profile', profile.user.id)
 
 def following(request, username):
-    print(username)
+    users = UserProfile.objects.all().order_by('followers')[0:5];
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
     uid = User.objects.get(username=username)
     profile = UserProfile.objects.get(user=uid)
     following = profile.following.all()
@@ -181,8 +195,26 @@ def following(request, username):
     return render(request, "network/following.html", {
         "posts":posts,
         'post_list': post_list,
-        'nums': nums
+        'nums': nums,
+        'users':users,
+        'recent_posts':recent_posts
     })
+
+
+def updateUser(request):
+    users = UserProfile.objects.all().order_by('followers')[0:5];
+    recent_posts = Post.objects.all().order_by('-dt_posted')[0:5];
+    uid = request.user
+    profile = UserProfile.objects.get(user=uid)
+    form = UserForm(instance=profile)
+    if request.method == 'POST':
+        form = UserForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', pk=uid.id)
+        else:
+            print('invalid')
+    return render(request, 'network/update-user.html', {'recent_posts':recent_posts, 'users':users, 'form':form})
     
 
 

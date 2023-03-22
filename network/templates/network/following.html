@@ -8,7 +8,7 @@
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'profile' post.username %}">{{ post.username }}</a>
+                    <a class="mr-2" href="{% url 'profile' post.username.id %}">{{ post.username }}</a>
                     <small class="text-muted">{{ post.dt_posted }}</small>
                 </div>
                 <div id="post-content-{{ post.id }}">
@@ -19,18 +19,18 @@
                             {% if user.is_authenticated %}
                             <form action="{% url 'like_post' post.id %}" method="POST" class='like-form' id="{{ post.id }}">
                                 {% csrf_token %}
-                                <button type="submit" name="post_id" value="{{ post.id }}" class="like-btn-{{ post.id }}">
+                                <button type="submit" name="post_id" value="{{ post.id }}" class="like-form-btn like-btn-{{ post.id }}">
                                     {% if request.user in post.likes.all %}
-                                        <i class="fa fa-solid fa-thumbs-down"></i> unlike
+                                    <i class="fa fa-solid fa-heart"></i> 
                                     {% else %}
-                                        <i class="fa fa-solid fa-thumbs-up"></i> like
+                                    <i class="far fa-regualr fa-heart"></i>
                                     {% endif %}
                                 </button>
                             </form>
                         <div class="like-count-{{ post.id }} ml-1 mr-1">{{ post.total_likes }}</div> 
                         <p>likes</p>
                         {% else %}
-                            <a href="{% url 'login' %}"><button class="btn btn-info like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
+                            <a href="{% url 'login' %}"><button class="like-form-btn btn like-btn-{{ post.id }}"><i class="fa fa-solid fa-thumbs-up"></i> like</button></a>
                             <div class="like-count-{{ post.id }}">{{ post.total_likes }}</div> likes
                         {% endif %}
                     </div>
@@ -43,16 +43,16 @@
 <nav aria-label="Page navigation example">
     <ul class="pagination justify-content-center">
         {% if post_list.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li> 
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.previous_page_number }}">Previous</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page=1">&laquo; First</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ post_list.previous_page_number }}">Previous</a></li> 
         {% endif %}
         <!--<li class="page-item disabled"><a class="page-link" href="#">Page {{ post_list.number }} of {{ post_list.paginator.num_pages }}</a></li> -->
         {% for i in nums %}
-            <li class="page-item"><a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a></li> 
         {% endfor %}
         {% if post_list.has_next%}
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.next_page_number }}">Next</a></li> 
-            <li class="page-item"><a class="page-link" href="?page={{ post_list.paginator.num_pages }}"> Last &raquo;</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ post_list.next_page_number }}">Next</a></li> 
+            <li class="page-item"><a class="btn btn--sub page-link" href="?page={{ post_list.paginator.num_pages }}"> Last &raquo;</a></li> 
         {% endif %}
 
      </ul>

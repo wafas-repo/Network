@@ -1,0 +1,32 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+
+<div class="container">
+    <div class="layout__box">
+      <div class="layout__box__header">
+        <div class="layout__boxTitle">
+          <a href="{% url 'index' %}">
+          </a>
+          <h2>Edit your profile</h2>
+        </div>
+      </div>
+      <div class="layout__body">
+        <form class="form" action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% for field in form %}
+            <div class="form__group">
+                <label for="profile_pic">{{field.label}}</label>
+                {{field}}
+            </div>
+          {% endfor %}
+            <a class="btn btn--dark" href="{% url 'index' %}">Cancel</a>
+            <button class="btn btn--main--update" type="submit">Update</button>
+        </form>
+      </div>
+    </div>
+ </div>
+
+{% endblock %}

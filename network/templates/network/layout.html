@@ -1,54 +1,108 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
     <head>
         <title>{% block title %}Social Network{% endblock %}</title>
         <script src="https://kit.fontawesome.com/f34d8750ac.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        {% load static %}
-        <link href="{% static 'network/styles.css' %}" rel="stylesheet">
+        <link href="{% static 'styles/styles.css' %}" rel="stylesheet">
         {% block script %}
-            <script src="{% static 'network/app.js' %}"></script>
+            <script src="{% static 'app.js' %}"></script>
         {% endblock %}
     </head>
     <body>
-
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="{% url 'index' %}">Network</a>
-          
-            <div>
-              <ul class="navbar-nav mr-auto">
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'profile' user.username %}"><strong>{{ user.username }}</strong></a>
-                    </li>
-                {% endif %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'index' %}">All Posts</a>
-                </li>
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'following' user.username %}">Following</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">Register</a>
-                    </li>
-                {% endif %}
-              </ul>
-            </div>
-          </nav>
-        
         <div class="body">
-            <div class="container">
-                {% block body %}
-                {% endblock %}
-            </dir>
+            <div class="home-container">
+                <div class="side-nav">
+                    <a href="{% url 'index' %}" class="header__logo">
+                        <img src="{% static 'images/network.png' %}">
+                        <h1>Network</h1>
+                    </a>
+                    <div class="nav-link-div">
+                        <ul style="gap: 15px;" class="navbar-nav mr-auto">
+                            {% if user.is_authenticated %}
+                                <li class="nav-item">
+                                    <div class="avatar avatar--small">
+                                        <img src="{{ user.profile.picture.url }}">
+                                    </div>   
+                                    <a class="nav-link" href="{% url 'profile' user.id %}"><strong>@{{ user.username }}</strong></a>
+                                </li>
+                            {% endif %}
+                            <li class="home-link nav-item">
+                                <svg width="80" height="68" viewBox="0 0 80 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M40 10.76L60 28.76V60H52V36H28V60H20V28.76L40 10.76ZM40 0L0 36H12V68H36V44H44V68H68V36H80L40 0Z" fill="#E5E5E5"/>
+                                </svg>
+                                <a class="nav-link" href="{% url 'index' %}">All Posts</a>
+                            </li>
+                            {% if user.is_authenticated %}
+                                <li class="home-link nav-item"> 
+                                    <svg width="80" height="56" viewBox="0 0 80 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M28 35C18.64 35 0 39.68 0 49V56H56V49C56 39.68 37.36 35 28 35ZM9.36 48C12.72 45.68 20.84 43 28 43C35.16 43 43.28 45.68 46.64 48H9.36ZM28 28C35.72 28 42 21.72 42 14C42 6.28 35.72 0 28 0C20.28 0 14 6.28 14 14C14 21.72 20.28 28 28 28ZM28 8C31.32 8 34 10.68 34 14C34 17.32 31.32 20 28 20C24.68 20 22 17.32 22 14C22 10.68 24.68 8 28 8ZM56.16 35.24C60.8 38.6 64 43.08 64 49V56H80V49C80 40.92 66 36.32 56.16 35.24ZM52 28C59.72 28 66 21.72 66 14C66 6.28 59.72 0 52 0C49.84 0 47.84 0.52 46 1.4C48.52 4.96 50 9.32 50 14C50 18.68 48.52 23.04 46 26.6C47.84 27.48 49.84 28 52 28Z" fill="#E5E5E5"/>
+                                    </svg>              
+                                    <a class="nav-link" href="{% url 'following' user.username %}">Following</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="btn--pill nav-link" href="{% url 'logout' %}">Log Out</a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a class="btn--pill nav-link" href="{% url 'login' %}">Log In</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="btn--pill nav-link" href="{% url 'register' %}">Register</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div style="width: 80%;" class="container">
+                    {% block body %}
+                    {% endblock %}
+                </div>
+                <div style="background: rgba(0,0,0,0); margin-top: 2.5rem;" class="highlights">
+                    <div class="highlights">
+                        <div class="highlights_header">
+                            <h3>Who To Follow</h3>
+                        </div>
+                        {% for user in users %}
+                            <div class="user-wrapper">
+                                <a style="text-decoration: none;" href="{% url 'profile' user.pk  %}" class="roomListRoom__author">
+                                    <div class="avatar avatar--small--highlights">
+                                        <img src="{{ user.picture.url }}">
+                                    </div>           
+                                    <h7 style="color: aliceblue;">@{{user.user}}</h7>
+                                </a>
+                                <a style="text-decoration: none;" href="{% url 'profile' user.pk  %}" class="roomListRoom__author">
+                                    <span class="host__follow">Follow</span>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <br>
+                    <div class="highlights">
+                        <div class="highlights_header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        {% for post in recent_posts %}
+                            <div class="activities__box">
+                                <div class="activities__boxHeader roomListRoom__header">
+                                    <a style="text-decoration: none;" href="{% url 'profile' post.username.id %}" class="roomListRoom__author">
+                                        <div class="avatar avatar--small">
+                                            <img src="{{ post.username.profile.picture.url }}">
+                                        </div>
+                                        <p>
+                                            @{{post.username}}
+                                            <span>{{post.dt_posted|timesince}}</span>
+                                        </p>
+                                      </a>
+                                </div>
+                                <small>Just posted:</small>
+                                <p class="activities__boxContent">{{post.content}}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
