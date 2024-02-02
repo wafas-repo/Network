@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -132,9 +133,29 @@ MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-STATICFILES_STORAGE="whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 STATICFILES_DIRS = [
    BASE_DIR / 'static'
 ]
 MEDIA_ROOT = BASE_DIR / 'static/media/uploads/profile_pictures'
+
+# AWS configuration
+
+AWS_ACCESS_KEY_ID = 'AKIAW3MD7YXCDNXPGRJ6'
+AWS_SECRET_ACCESS_KEY = '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'
+
+# Storage configuration for amazon S3
+
+AWS_STORAGE_BUCKET_NAME = 'network-bkt-1'
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+AWS_S3_FILE_OVERWRITE = False
+
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+STATICFILES_STORAGE= 'storages.backends.s3boto3.S3Boto3Storage'
+
+
+
