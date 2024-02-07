@@ -140,10 +140,6 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = BASE_DIR / 'static/media/uploads/profile_pictures'
 
-# AWS configuration
-
-AWS_ACCESS_KEY_ID = 'AKIAW3MD7YXCDNXPGRJ6'
-AWS_SECRET_ACCESS_KEY = '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'
 
 # Storage configuration for amazon S3
 
